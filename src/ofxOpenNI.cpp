@@ -235,7 +235,8 @@ void ofxOpenNI::addLicense(string sVendor, string sKey) {
 
 }
 
-bool ofxOpenNI::setupFromXML(string xml, bool color, bool depth, bool IR){
+bool ofxOpenNI::setupFromXML(string xml, bool _threaded){
+	threaded = _threaded;
 	XnStatus nRetVal = XN_STATUS_OK;
 	EnumerationErrors errors;
 
@@ -246,12 +247,13 @@ bool ofxOpenNI::setupFromXML(string xml, bool color, bool depth, bool IR){
 
 	openCommon();
 
-	startThread(true,false);
+	if(threaded) startThread(true,false);
 
 	return true;
 }
 
-bool ofxOpenNI::setupFromRecording(string recording){
+bool ofxOpenNI::setupFromRecording(string recording, bool _threaded){
+	threaded = _threaded;
 	xnLogInitFromXmlFile(ofToDataPath("openni/config/ofxopenni_config.xml").c_str());
 
 	XnStatus nRetVal = g_Context.Init();
@@ -266,7 +268,7 @@ bool ofxOpenNI::setupFromRecording(string recording){
 
 	openCommon();
 
-	startThread(true,false);
+	if(threaded) startThread(true,false);
 
 	return true;
 }
@@ -303,30 +305,31 @@ void ofxOpenNI::readFrame(){
 	if (g_Audio.IsValid()){
 		g_Audio.GetMetaData(g_AudioMD);
 	}
+
+	if(g_bIsDepthOn){
+		generateDepthPixels();
+	}
+	if(g_bIsImageOn){
+		generateImagePixels();
+	}
+	lock();
+	if(g_bIsDepthOn){
+		ofPixels * auxP = backDepthPixels;
+		backDepthPixels = currentDepthPixels;
+		currentDepthPixels = auxP;
+	}
+	if(g_bIsImageOn){
+		ofPixels * auxP = backRGBPixels;
+		backRGBPixels = currentRGBPixels;
+		currentRGBPixels = auxP;
+	}
+	bNewPixels = true;
+	unlock();
 }
 
 void ofxOpenNI::threadedFunction(){
 	while(isThreadRunning()){
 		readFrame();
-		if(g_bIsDepthOn){
-			generateDepthPixels();
-		}
-		if(g_bIsImageOn){
-			generateImagePixels();
-		}
-		lock();
-		if(g_bIsDepthOn){
-			ofPixels * auxP = backDepthPixels;
-			backDepthPixels = currentDepthPixels;
-			currentDepthPixels = auxP;
-		}
-		if(g_bIsImageOn){
-			ofPixels * auxP = backRGBPixels;
-			backRGBPixels = currentRGBPixels;
-			currentRGBPixels = auxP;
-		}
-		bNewPixels = true;
-		unlock();
 	}
 }
 
@@ -335,7 +338,12 @@ bool ofxOpenNI::isNewFrame(){
 }
 
 void ofxOpenNI::update(){
-	lock();
+	if(!threaded){
+		readFrame();
+	}else{
+		lock();
+	}
+
 	if(bNewPixels){
 		if(g_bIsDepthOn && useTexture){
 			depthTexture.loadData(*currentDepthPixels);
@@ -346,7 +354,10 @@ void ofxOpenNI::update(){
 		bNewPixels = false;
 		bNewFrame = true;
 	}
-	unlock();
+
+	if(threaded){
+		unlock();
+	}
 }
 
 void ofxOpenNI::generateImagePixels(){
@@ -590,4 +601,26 @@ float ofxOpenNI::getHeight(){
 	}else{
 		return 0;
 	}
+}
+
+ofPoint ofxOpenNI::worldToProjective(const ofPoint & p){
+	XnVector3D world = toXn(p);
+	return worldToProjective(world);
+}
+
+ofPoint ofxOpenNI::worldToProjective(const XnVector3D & p){
+	XnVector3D proj;
+	g_Depth.ConvertRealWorldToProjective(1, &p, &proj);
+	return toOf(proj);
+}
+
+ofPoint ofxOpenNI::projectiveToWorld(const ofPoint & p){
+	XnVector3D proj = toXn(p);
+	return projectiveToWorld(proj);
+}
+
+ofPoint ofxOpenNI::projectiveToWorld(const XnVector3D & p){
+	XnVector3D world;
+	g_Depth.ConvertProjectiveToRealWorld(1, &p, &world);
+	return toOf(world);
 }

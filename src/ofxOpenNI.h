@@ -11,8 +11,8 @@ class ofxOpenNI: public ofThread{
 public:
 	ofxOpenNI();
 
-	bool setupFromXML(string xml, bool color=true, bool depth=true, bool IR=false);
-	bool setupFromRecording(string recording);
+	bool setupFromXML(string xml, bool threaded=true);
+	bool setupFromRecording(string recording, bool threaded=true);
 
 	bool isNewFrame();
 	void update();
@@ -39,6 +39,12 @@ public:
 	};
 
 	void setDepthColoring(DepthColoring coloring);
+
+	ofPoint worldToProjective(const ofPoint & p);
+	ofPoint worldToProjective(const XnVector3D & p);
+
+	ofPoint projectiveToWorld(const ofPoint & p);
+	ofPoint projectiveToWorld(const XnVector3D & p);
 
 
 	void addLicense(string sVendor, string sKey);
@@ -121,6 +127,7 @@ private:
 	bool useTexture;
 	bool bNewPixels;
 	bool bNewFrame;
+	bool threaded;
 
 
 	// depth
