@@ -40,6 +40,10 @@ public:
 
 	void setDepthColoring(DepthColoring coloring);
 
+	bool toggleCalibratedRGBDepth();
+	bool enableCalibratedRGBDepth();
+	bool disableCalibratedRGBDepth();
+
 	ofPoint worldToProjective(const ofPoint & p);
 	ofPoint worldToProjective(const XnVector3D & p);
 

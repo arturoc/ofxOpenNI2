@@ -374,6 +374,65 @@ void ofxOpenNI::update(){
 }
 
 //----------------------------------------
+bool ofxOpenNI::toggleCalibratedRGBDepth(){
+
+	// TODO: make work with IR generator
+	if (!g_Image.IsValid()) {
+		printf("No Image generator found: cannot register viewport");
+		return false;
+	}
+
+	// Toggle registering view point to image map
+	if (g_Depth.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT))
+	{
+
+		if(g_Depth.GetAlternativeViewPointCap().IsViewPointAs(g_Image)) {
+			disableCalibratedRGBDepth();
+		} else {
+			enableCalibratedRGBDepth();
+		}
+
+	} else return false;
+
+	return true;
+}
+
+//----------------------------------------
+bool ofxOpenNI::enableCalibratedRGBDepth(){
+	if (!g_Image.IsValid()) {
+		printf("No Image generator found: cannot register viewport");
+		return false;
+	}
+
+	// Register view point to image map
+	if(g_Depth.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT)){
+
+		XnStatus result = g_Depth.GetAlternativeViewPointCap().SetViewPoint(g_Image);
+		SHOW_RC(result, "Register viewport");
+		if(result!=XN_STATUS_OK) return false;
+	}else{
+		return false;
+	}
+
+	return true;
+}
+
+//----------------------------------------
+bool ofxOpenNI::disableCalibratedRGBDepth(){
+
+	// Unregister view point from (image) any map
+	if (g_Depth.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT)) {
+		XnStatus result = g_Depth.GetAlternativeViewPointCap().ResetViewPoint();
+		SHOW_RC(result, "Unregister viewport");
+		if(result!=XN_STATUS_OK) return false;
+	}else{
+		return false;
+	}
+
+	return true;
+}
+
+//----------------------------------------
 void ofxOpenNI::generateImagePixels(){
 	xn::ImageMetaData imd;
 	g_Image.GetMetaData(imd);
