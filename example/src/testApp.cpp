@@ -8,7 +8,7 @@ void testApp::setup(){
 	bool live = true;
 
 	if(live){
-		openNI.setupFromXML("openni/config/ofxopenni_config.xml");
+		openNI.setupFromXML("openni/config/ofxopenni_config.xml",false);
 	}else{
 		openNI.setupFromRecording("recording.oni");
 	}
