@@ -8,6 +8,7 @@
 #include <XnCppWrapper.h>
 #include <XnTypes.h>
 #include "ofConstants.h"
+#include "ofxOpenNIUtils.h"
 
 #define YUV422_U  0
 #define YUV422_Y1 1
