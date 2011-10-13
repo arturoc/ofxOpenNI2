@@ -21,6 +21,7 @@ string ofxOpenNICapture::LOG_NAME = "ofxOpenNICapture";
 	}
 
 
+//----------------------------------------
 ofxOpenNICapture::ofxOpenNICapture(){
 	// Depth Formats
 	int nIndex = 0;
@@ -97,6 +98,7 @@ ofxOpenNICapture::ofxOpenNICapture(){
 	pRecorder = NULL;
 }
 
+//----------------------------------------
 bool ofxOpenNICapture::setup(ofxOpenNI & _context, string filename, XnCodecID depthFormat, XnCodecID imageFormat, XnCodecID irFormat, XnCodecID audioFormat){
 	context = &_context;
 	csFileName = ofToDataPath(filename);
@@ -123,6 +125,7 @@ bool ofxOpenNICapture::setup(ofxOpenNI & _context, string filename, XnCodecID de
 	return true;
 }
 
+//----------------------------------------
 bool ofxOpenNICapture::startCapture(){
 	if (csFileName.empty())
 	{
@@ -140,6 +143,7 @@ bool ofxOpenNICapture::startCapture(){
 	return true;
 }
 
+//----------------------------------------
 void ofxOpenNICapture::stopCapture(){
 	if (pRecorder != NULL){
 		pRecorder->Release();
@@ -148,6 +152,7 @@ void ofxOpenNICapture::stopCapture(){
 	}
 }
 
+//----------------------------------------
 XnStatus ofxOpenNICapture::captureFrame(){
 	XnStatus nRetVal = XN_STATUS_OK;
 
@@ -232,6 +237,7 @@ XnStatus ofxOpenNICapture::captureFrame(){
 	return XN_STATUS_OK;
 }
 
+//----------------------------------------
 void ofxOpenNICapture::update(){
 	captureFrame();
 }

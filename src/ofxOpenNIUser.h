@@ -36,12 +36,16 @@ public:
 	ofPoint worldBegin, worldEnd;
 	bool found;
 
+	vector<ofxOpenNILimb*> jointLimbs;
+
 	void debugDraw() {
 		if(!found)
 			return;
+		ofPushStyle();
 		ofSetLineWidth(5);
 		ofSetColor(255,0,0);
 		ofLine(ofVec2f(begin),ofVec2f(end));
+		ofPopStyle();
 	}
 };
 

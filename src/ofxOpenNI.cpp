@@ -24,6 +24,7 @@ XnUInt8 PalletIntsR [256] = {0};
 XnUInt8 PalletIntsG [256] = {0};
 XnUInt8 PalletIntsB [256] = {0};
 
+//----------------------------------------
 static void CreateRainbowPallet() {
 	if(rainbowPalletInit) return;
 
@@ -61,6 +62,7 @@ static void CreateRainbowPallet() {
 	rainbowPalletInit = true;
 }
 
+//----------------------------------------
 ofxOpenNI::ofxOpenNI(){
 	CreateRainbowPallet();
 
@@ -119,7 +121,7 @@ void ofxOpenNI::initConstants(){
 
 }
 
-
+//----------------------------------------
 void ofxOpenNI::allocateDepthBuffers(){
 	if(g_bIsDepthOn){
 		max_depth	= g_Depth.GetDeviceMaxDepth();
@@ -131,6 +133,7 @@ void ofxOpenNI::allocateDepthBuffers(){
 	}
 }
 
+//----------------------------------------
 void ofxOpenNI::allocateRGBBuffers(){
 	if(g_bIsImageOn){
 		rgbPixels[0].allocate(640,480,OF_IMAGE_COLOR);
@@ -141,6 +144,7 @@ void ofxOpenNI::allocateRGBBuffers(){
 	}
 }
 
+//----------------------------------------
 void XN_CALLBACK_TYPE ofxOpenNI::onErrorStateChanged(XnStatus errorState, void* pCookie){
 
 	if (errorState != XN_STATUS_OK){
@@ -151,6 +155,7 @@ void XN_CALLBACK_TYPE ofxOpenNI::onErrorStateChanged(XnStatus errorState, void* 
 	}
 }
 
+//----------------------------------------
 void ofxOpenNI::openCommon(){
 	XnStatus nRetVal = XN_STATUS_OK;
 
@@ -211,6 +216,7 @@ void ofxOpenNI::openCommon(){
 	readFrame();
 }
 
+//----------------------------------------
 void ofxOpenNI::addLicense(string sVendor, string sKey) {
 
 	XnLicense license = {0};
@@ -235,6 +241,7 @@ void ofxOpenNI::addLicense(string sVendor, string sKey) {
 
 }
 
+//----------------------------------------
 bool ofxOpenNI::setupFromXML(string xml, bool _threaded){
 	threaded = _threaded;
 	XnStatus nRetVal = XN_STATUS_OK;
@@ -252,6 +259,7 @@ bool ofxOpenNI::setupFromXML(string xml, bool _threaded){
 	return true;
 }
 
+//----------------------------------------
 bool ofxOpenNI::setupFromRecording(string recording, bool _threaded){
 	threaded = _threaded;
 	xnLogInitFromXmlFile(ofToDataPath("openni/config/ofxopenni_config.xml").c_str());
@@ -273,10 +281,12 @@ bool ofxOpenNI::setupFromRecording(string recording, bool _threaded){
 	return true;
 }
 
+//----------------------------------------
 void ofxOpenNI::setDepthColoring(DepthColoring coloring){
 	depth_coloring = coloring;
 }
 
+//----------------------------------------
 void ofxOpenNI::readFrame(){
 	XnStatus rc = XN_STATUS_OK;
 
@@ -327,16 +337,19 @@ void ofxOpenNI::readFrame(){
 	unlock();
 }
 
+//----------------------------------------
 void ofxOpenNI::threadedFunction(){
 	while(isThreadRunning()){
 		readFrame();
 	}
 }
 
+//----------------------------------------
 bool ofxOpenNI::isNewFrame(){
 	return bNewFrame;
 }
 
+//----------------------------------------
 void ofxOpenNI::update(){
 	if(!threaded){
 		readFrame();
@@ -360,6 +373,7 @@ void ofxOpenNI::update(){
 	}
 }
 
+//----------------------------------------
 void ofxOpenNI::generateImagePixels(){
 	xn::ImageMetaData imd;
 	g_Image.GetMetaData(imd);
@@ -368,15 +382,17 @@ void ofxOpenNI::generateImagePixels(){
 	backRGBPixels->setFromPixels(pImage, imd.XRes(),imd.YRes(),OF_IMAGE_COLOR);
 }
 
+//----------------------------------------
 void ofxOpenNI::draw(int x, int y){
 	depthTexture.draw(x,y);
 }
 
-
+//----------------------------------------
 void ofxOpenNI::drawRGB(int x, int y){
 	rgbTexture.draw(x,y);
 }
 
+//----------------------------------------
 void ofxOpenNI::generateDepthPixels(){
 
 	// get the pixels
@@ -525,60 +541,74 @@ void ofxOpenNI::generateDepthPixels(){
 
 }
 
+//----------------------------------------
 xn::Context & ofxOpenNI::getXnContext(){
 	return g_Context;
 }
 
+//----------------------------------------
 xn::Device & ofxOpenNI::getDevice(){
 	return g_Device;
 }
 
+//----------------------------------------
 xn::DepthGenerator & ofxOpenNI::getDepthGenerator(){
 	return g_Depth;
 }
 
+//----------------------------------------
 xn::ImageGenerator & ofxOpenNI::getImageGenerator(){
 	return g_Image;
 }
 
+//----------------------------------------
 xn::IRGenerator & ofxOpenNI::getIRGenerator(){
 	return g_IR;
 }
 
+//----------------------------------------
 xn::AudioGenerator & ofxOpenNI::getAudioGenerator(){
 	return g_Audio;
 }
 
+//----------------------------------------
 xn::Player & ofxOpenNI::getPlayer(){
 	return g_Player;
 }
 
+//----------------------------------------
 xn::DepthMetaData & ofxOpenNI::getDepthMetaData(){
 	return g_DepthMD;
 }
 
+//----------------------------------------
 xn::ImageMetaData & ofxOpenNI::getImageMetaData(){
 	return g_ImageMD;
 }
 
+//----------------------------------------
 xn::IRMetaData & ofxOpenNI::getIRMetaData(){
 	return g_irMD;
 }
 
+//----------------------------------------
 xn::AudioMetaData & ofxOpenNI::getAudioMetaData(){
 	return g_AudioMD;
 }
 
+//----------------------------------------
 ofPixels & ofxOpenNI::getDepthPixels(){
 	Poco::ScopedLock<ofMutex> lock(mutex);
 	return *currentDepthPixels;
 }
 
+//----------------------------------------
 ofPixels & ofxOpenNI::getRGBPixels(){
 	Poco::ScopedLock<ofMutex> lock(mutex);
 	return *currentRGBPixels;
 }
 
+//----------------------------------------
 float ofxOpenNI::getWidth(){
 	if(g_bIsDepthOn){
 		return g_DepthMD.XRes();
@@ -591,6 +621,7 @@ float ofxOpenNI::getWidth(){
 	}
 }
 
+//----------------------------------------
 float ofxOpenNI::getHeight(){
 	if(g_bIsDepthOn){
 		return g_DepthMD.YRes();
@@ -603,22 +634,26 @@ float ofxOpenNI::getHeight(){
 	}
 }
 
+//----------------------------------------
 ofPoint ofxOpenNI::worldToProjective(const ofPoint & p){
 	XnVector3D world = toXn(p);
 	return worldToProjective(world);
 }
 
+//----------------------------------------
 ofPoint ofxOpenNI::worldToProjective(const XnVector3D & p){
 	XnVector3D proj;
 	g_Depth.ConvertRealWorldToProjective(1, &p, &proj);
 	return toOf(proj);
 }
 
+//----------------------------------------
 ofPoint ofxOpenNI::projectiveToWorld(const ofPoint & p){
 	XnVector3D proj = toXn(p);
 	return projectiveToWorld(proj);
 }
 
+//----------------------------------------
 ofPoint ofxOpenNI::projectiveToWorld(const XnVector3D & p){
 	XnVector3D world;
 	g_Depth.ConvertProjectiveToRealWorld(1, &p, &world);

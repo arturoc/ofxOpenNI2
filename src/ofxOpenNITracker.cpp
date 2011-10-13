@@ -19,7 +19,8 @@ string ofxOpenNITracker::LOG_NAME = "ofxOpenNITracker";
 
 // CALLBACKS
 // =============================================================================
-// Callback: New user was detected
+
+//----------------------------------------
 void XN_CALLBACK_TYPE ofxOpenNITracker::User_NewUser(xn::UserGenerator& rGenerator, XnUserID nID, void* pCookie){
 	ofLogVerbose(LOG_NAME) << "New User" << nID;
 
@@ -31,14 +32,14 @@ void XN_CALLBACK_TYPE ofxOpenNITracker::User_NewUser(xn::UserGenerator& rGenerat
 	}
 }
 
-// Callback: An existing user was lost
+//----------------------------------------
 void XN_CALLBACK_TYPE ofxOpenNITracker::User_LostUser(xn::UserGenerator& rGenerator, XnUserID nID, void* pCookie){
 	ofLogVerbose(LOG_NAME) << "Lost user" << nID;
 	rGenerator.GetSkeletonCap().Reset(nID);
 
 }
 
-// Callback: Detected a pose
+//----------------------------------------
 void XN_CALLBACK_TYPE ofxOpenNITracker::UserPose_PoseDetected(xn::PoseDetectionCapability& rCapability, const XnChar* strPose, XnUserID nID, void* pCookie){
 	ofxOpenNITracker* tracker = static_cast<ofxOpenNITracker*>(pCookie);
 	ofLogVerbose(LOG_NAME) << "Pose" << strPose << "detected for user" << nID;
@@ -47,12 +48,13 @@ void XN_CALLBACK_TYPE ofxOpenNITracker::UserPose_PoseDetected(xn::PoseDetectionC
 }
 
 
-
+//----------------------------------------
 void XN_CALLBACK_TYPE ofxOpenNITracker::UserCalibration_CalibrationStart(xn::SkeletonCapability& capability, XnUserID nID, void* pCookie){
 	ofLogVerbose(LOG_NAME) << "Calibration started for user" << nID;
 }
 
 
+//----------------------------------------
 void XN_CALLBACK_TYPE ofxOpenNITracker::UserCalibration_CalibrationEnd(xn::SkeletonCapability& rCapability, XnUserID nID, XnCalibrationStatus bSuccess, void* pCookie){
 	ofxOpenNITracker* tracker = static_cast<ofxOpenNITracker*>(pCookie);
 	if(bSuccess == XN_CALIBRATION_STATUS_OK) {
@@ -67,6 +69,11 @@ void XN_CALLBACK_TYPE ofxOpenNITracker::UserCalibration_CalibrationEnd(xn::Skele
 	}
 }
 
+
+
+
+
+//----------------------------------------
 ofxOpenNITracker::ofxOpenNITracker(){
 	openNI = NULL;
 	smoothing_factor = 1;
@@ -74,6 +81,7 @@ ofxOpenNITracker::ofxOpenNITracker(){
 	useMaskPixels = false;
 }
 
+//----------------------------------------
 bool ofxOpenNITracker::setup(ofxOpenNI & _openNI){
 	openNI = &_openNI;
 
@@ -173,14 +181,17 @@ bool ofxOpenNITracker::setup(ofxOpenNI & _openNI){
 	return true;
 }
 
+//----------------------------------------
 void ofxOpenNITracker::setUseMaskPixels(bool b){
 	useMaskPixels = b;
 }
 
+//----------------------------------------
 void ofxOpenNITracker::setUsePointClouds(bool b){
 	usePointClouds = b;
 }
 
+//----------------------------------------
 void ofxOpenNITracker::setSmoothing(float smooth){
 	if (smooth > 0.0f && smooth < 1.0f) {
 		smoothing_factor = smooth;
@@ -190,6 +201,7 @@ void ofxOpenNITracker::setSmoothing(float smooth){
 	}
 }
 
+//----------------------------------------
 float ofxOpenNITracker::getSmoothing(){
 	return smoothing_factor;
 }
@@ -287,6 +299,7 @@ void ofxOpenNITracker::updatePointClouds(ofxOpenNIUser & user) {
 	}
 }
 
+//----------------------------------------
 void ofxOpenNITracker::updateUserPixels(ofxOpenNIUser & user){
 	xn::SceneMetaData smd;
 	unsigned short *userPix;
@@ -311,6 +324,7 @@ void ofxOpenNITracker::updateUserPixels(ofxOpenNIUser & user){
 	}
 }
 
+//----------------------------------------
 void ofxOpenNITracker::draw(){
 	ofPushStyle();
 	// show green/red circle if any one is found
@@ -362,23 +376,27 @@ bool ofxOpenNITracker::needsPoseForCalibration() {
 	return needs_pose;
 }
 
+//----------------------------------------
 xn::UserGenerator&	ofxOpenNITracker::getXnUserGenerator(){
 	return user_generator;
 }
 
+//----------------------------------------
 int	ofxOpenNITracker::getNumberOfTrackedUsers(){
 	return tracked_users_index.size();
 }
 
+//----------------------------------------
 ofxOpenNIUser&	ofxOpenNITracker::getTrackedUser(int nUserNum){
 	return tracked_users[tracked_users_index[nUserNum]];
 }
 
-
+//----------------------------------------
 float ofxOpenNITracker::getWidth(){
 	return width;
 }
 
+//----------------------------------------
 float ofxOpenNITracker::getHeight(){
 	return height;
 }

@@ -7,6 +7,7 @@
 
 #include "ofxOpenNIUser.h"
 
+//----------------------------------------
 ofxOpenNIUser::ofxOpenNIUser(){
 	limbs.resize(NumLimbs);
 
@@ -39,6 +40,7 @@ ofxOpenNIUser::ofxOpenNIUser(){
 	limbs[Hip].set(XN_SKEL_LEFT_HIP, XN_SKEL_RIGHT_HIP);
 }
 
+//----------------------------------------
 void ofxOpenNIUser::debugDraw() {
 
 	for(int i=0;i<NumLimbs;i++){
@@ -48,10 +50,12 @@ void ofxOpenNIUser::debugDraw() {
 	//ofDrawBitmapString(ofToString((int)id), neck.position[0].X + 10, neck.position[0].Y);
 }
 
+//----------------------------------------
 ofxOpenNILimb & ofxOpenNIUser::getLimb(Limb limb){
 	return limbs[limb];
 }
 
+//----------------------------------------
 int ofxOpenNIUser::getNumLimbs(){
 	return NumLimbs;
 }

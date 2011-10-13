@@ -31,6 +31,7 @@
 
 #ifdef TARGET_WIN32
 
+//----------------------------------------
 void YUV422ToRGB888(const XnUInt8* pYUVImage, XnUInt8* pRGBAImage, XnUInt32 nYUVSize, XnUInt32 nRGBSize)
 {
 	const XnUInt8* pYUVLast = pYUVImage + nYUVSize - 8;
@@ -144,6 +145,7 @@ void YUV422ToRGB888(const XnUInt8* pYUVImage, XnUInt8* pRGBAImage, XnUInt32 nYUV
 
 #else // not Win32
 
+//----------------------------------------
 void YUV444ToRGBA(XnUInt8 cY, XnUInt8 cU, XnUInt8 cV, XnUInt8& cR, XnUInt8& cG, XnUInt8& cB, XnUInt8& cA)
 {
 	XnInt32 nC = cY - 16;
@@ -158,6 +160,7 @@ void YUV444ToRGBA(XnUInt8 cY, XnUInt8 cU, XnUInt8 cV, XnUInt8& cR, XnUInt8& cG, 
 	cA = 255;
 }
 
+//----------------------------------------
 void YUV422ToRGB888(const XnUInt8* pYUVImage, XnUInt8* pRGBImage, XnUInt32 nYUVSize, XnUInt32 nRGBSize)
 {
 	const XnUInt8* pCurrYUV = pYUVImage;
