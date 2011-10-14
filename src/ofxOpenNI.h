@@ -22,7 +22,11 @@ public:
 	void setUseTexture(bool useTexture);
 
 	ofPixels & getDepthPixels();
+	ofShortPixels & getDepthRawPixels();
 	ofPixels & getRGBPixels();
+	
+	ofTexture & getDepthTextureReference();
+	ofTexture & getRGBTextureReference();
 
 	float getWidth();
 	float getHeight();
@@ -78,6 +82,7 @@ private:
 	void generateDepthPixels();
 	void generateImagePixels();
 	void allocateDepthBuffers();
+	void allocateDepthRawBuffers();
 	void allocateRGBBuffers();
 
 	static void XN_CALLBACK_TYPE onErrorStateChanged(XnStatus errorState, void* pCookie);
@@ -110,6 +115,8 @@ private:
 	bool g_bIsIROn;
 	bool g_bIsAudioOn;
 	bool g_bIsPlayerOn;
+	
+	bool g_bIsDepthRawOnOption;
 
 	xn::Device g_Device;
 	xn::DepthGenerator g_Depth;
@@ -140,6 +147,10 @@ private:
 	ofPixels * backDepthPixels, * currentDepthPixels;
 	DepthColoring depth_coloring;
 	float	max_depth;
+	
+	// depth raw
+	ofShortPixels depthRawPixels[2];
+	ofShortPixels * backDepthRawPixels, * currentDepthRawPixels;
 
 	// rgb
 	ofTexture rgbTexture;
