@@ -134,6 +134,16 @@ void ofxOpenNI::allocateDepthBuffers(){
 }
 
 //----------------------------------------
+void ofxOpenNI::allocateDepthRawBuffers(){
+	if(g_bIsDepthRawOnOption){
+		depthRawPixels[0].allocate(640,480,OF_PIXELS_MONO);
+		depthRawPixels[1].allocate(640,480,OF_PIXELS_MONO);
+		currentDepthRawPixels = &depthRawPixels[0];
+		backDepthRawPixels = &depthRawPixels[1];
+	}
+}
+
+//----------------------------------------
 void ofxOpenNI::allocateRGBBuffers(){
 	if(g_bIsImageOn){
 		rgbPixels[0].allocate(640,480,OF_IMAGE_COLOR);
@@ -164,6 +174,8 @@ void ofxOpenNI::openCommon(){
 	g_bIsIROn = false;
 	g_bIsAudioOn = false;
 	g_bIsPlayerOn = false;
+	
+	g_bIsDepthRawOnOption = false;
 
 	NodeInfoList list;
 	nRetVal = g_Context.EnumerateExistingNodes(list);
@@ -180,6 +192,7 @@ void ofxOpenNI::openCommon(){
 			case XN_NODE_TYPE_DEPTH:
 				ofLogVerbose(LOG_NAME) << "Creating depth generator";
 				g_bIsDepthOn = true;
+				g_bIsDepthRawOnOption = true;
 				(*it).GetInstance(g_Depth);
 				break;
 			case XN_NODE_TYPE_IMAGE:
@@ -211,6 +224,7 @@ void ofxOpenNI::openCommon(){
 
 	initConstants();
 	allocateDepthBuffers();
+	allocateDepthRawBuffers();
 	allocateRGBBuffers();
 
 	readFrame();
@@ -319,14 +333,21 @@ void ofxOpenNI::readFrame(){
 	if(g_bIsDepthOn){
 		generateDepthPixels();
 	}
+
 	if(g_bIsImageOn){
 		generateImagePixels();
 	}
+	
 	lock();
 	if(g_bIsDepthOn){
 		ofPixels * auxP = backDepthPixels;
 		backDepthPixels = currentDepthPixels;
 		currentDepthPixels = auxP;
+		if (g_bIsDepthRawOnOption) {
+			ofShortPixels * auxP = backDepthRawPixels;
+			backDepthRawPixels = currentDepthRawPixels;
+			currentDepthRawPixels = auxP;
+		}
 	}
 	if(g_bIsImageOn){
 		ofPixels * auxP = backRGBPixels;
@@ -460,6 +481,10 @@ void ofxOpenNI::generateDepthPixels(){
 
 	if (g_DepthMD.FrameID() == 0) return;
 
+	// copy raw values
+	if (g_bIsDepthRawOnOption)
+		backDepthRawPixels->setFromPixels(depth, 640, 480, 1);
+	
 	// copy depth into texture-map
 	float max;
 	for (XnUInt16 y = g_DepthMD.YOffset(); y < g_DepthMD.YRes() + g_DepthMD.YOffset(); y++) {
@@ -662,6 +687,17 @@ ofPixels & ofxOpenNI::getDepthPixels(){
 }
 
 //----------------------------------------
+ofShortPixels & ofxOpenNI::getDepthRawPixels(){
+	Poco::ScopedLock<ofMutex> lock(mutex);
+	
+	if (!g_bIsDepthRawOnOption) {
+		ofLogWarning(LOG_NAME) << "g_bIsDepthRawOnOption was disabled, enabling raw pixels";
+		g_bIsDepthRawOnOption = true;
+	}
+	return *currentDepthRawPixels;
+}
+
+//----------------------------------------
 ofPixels & ofxOpenNI::getRGBPixels(){
 	Poco::ScopedLock<ofMutex> lock(mutex);
 	return *currentRGBPixels;
@@ -686,6 +722,7 @@ float ofxOpenNI::getWidth(){
 	}else if(g_bIsIROn){
 		return g_irMD.XRes();
 	}else{
+		ofLogWarning(LOG_NAME) << "getWidth() : We haven't yet initialised any generators, so this value returned is returned as 0";
 		return 0;
 	}
 }
@@ -699,6 +736,7 @@ float ofxOpenNI::getHeight(){
 	}else if(g_bIsIROn){
 		return g_irMD.YRes();
 	}else{
+		ofLogWarning(LOG_NAME) << "getHeight() : We haven't yet initialised any generators, so this value returned is returned as 0";
 		return 0;
 	}
 }
