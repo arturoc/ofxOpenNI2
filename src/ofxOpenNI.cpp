@@ -340,19 +340,13 @@ void ofxOpenNI::readFrame(){
 	
 	lock();
 	if(g_bIsDepthOn){
-		ofPixels * auxP = backDepthPixels;
-		backDepthPixels = currentDepthPixels;
-		currentDepthPixels = auxP;
+		swap(backDepthPixels,currentDepthPixels);
 		if (g_bIsDepthRawOnOption) {
-			ofShortPixels * auxP = backDepthRawPixels;
-			backDepthRawPixels = currentDepthRawPixels;
-			currentDepthRawPixels = auxP;
+			swap(backDepthRawPixels,currentDepthRawPixels);
 		}
 	}
 	if(g_bIsImageOn){
-		ofPixels * auxP = backRGBPixels;
-		backRGBPixels = currentRGBPixels;
-		currentRGBPixels = auxP;
+		swap(backRGBPixels,currentRGBPixels);
 	}
 	bNewPixels = true;
 	unlock();
