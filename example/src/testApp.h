@@ -1,8 +1,6 @@
 #ifndef _TEST_APP
 #define _TEST_APP
 
-//#define USE_IR // Uncomment this to use infra red instead of RGB cam...
-
 #include "ofxOpenNI.h"
 #include "ofxOpenNICapture.h"
 #include "ofMain.h"
