@@ -6,7 +6,6 @@
 #include "ofxOpenNI.h"
 #include "ofxOpenNICapture.h"
 #include "ofMain.h"
-#include "ofxBullet.h"
 
 class testApp : public ofBaseApp{
 
