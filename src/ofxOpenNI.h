@@ -23,6 +23,9 @@ public:
 
 	ofPixels & getDepthPixels();
 	ofPixels & getRGBPixels();
+	
+	ofTexture & getDepthTextureReference();
+	ofTexture & getRGBTextureReference();
 
 	float getWidth();
 	float getHeight();

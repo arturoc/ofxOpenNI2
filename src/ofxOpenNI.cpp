@@ -668,6 +668,16 @@ ofPixels & ofxOpenNI::getRGBPixels(){
 }
 
 //----------------------------------------
+ofTexture & ofxOpenNI::getDepthTextureReference(){
+	return depthTexture;
+}
+
+//----------------------------------------
+ofTexture & ofxOpenNI::getRGBTextureReference(){
+	return rgbTexture;
+}
+
+//----------------------------------------
 float ofxOpenNI::getWidth(){
 	if(g_bIsDepthOn){
 		return g_DepthMD.XRes();
