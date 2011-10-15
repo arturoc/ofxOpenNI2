@@ -767,7 +767,7 @@ void ofxOpenNI::cameraToWorld(const vector<ofVec2f>& c, vector<ofVec3f>& w){
 	w.resize(nPoints);
 	
 	if (!g_bIsDepthRawOnOption) {
-		ofLogError(LOG_NAME) << "ofxOpenNI::cameraToWorld - cannot perform this function if g_bIsDepthRawOnOption is off. Try calling getDepthRawPixels(..) to enable raw depth data caching";
+		ofLogError(LOG_NAME) << "ofxOpenNI::cameraToWorld - cannot perform this function if g_bIsDepthRawOnOption is false. You can enabled g_bIsDepthRawOnOption by calling getDepthRawPixels(..).";
 		return;
 	}
 	
