@@ -760,3 +760,43 @@ ofPoint ofxOpenNI::projectiveToWorld(const XnVector3D & p){
 	g_Depth.ConvertProjectiveToRealWorld(1, &p, &world);
 	return toOf(world);
 }
+
+//----------------------------------------
+ofPoint ofxOpenNI::cameraToWorld(const ofVec2f & c){
+	vector<ofVec2f> vc(1, c);
+	vector<ofVec3f> vw(1);
+	
+	cameraToWorld(vc, vw);
+	
+	return vw[0];
+}
+
+//----------------------------------------
+void ofxOpenNI::cameraToWorld(const vector<ofVec2f>& c, vector<ofVec3f>& w){
+	const int nPoints = c.size();
+	w.resize(nPoints);
+	
+	if (!g_bIsDepthRawOnOption) {
+		ofLogError(LOG_NAME) << "ofxOpenNI::cameraToWorld - cannot perform this function if g_bIsDepthRawOnOption is false. You can enabled g_bIsDepthRawOnOption by calling getDepthRawPixels(..).";
+		return;
+	}
+	
+	vector<XnPoint3D> projective(nPoints);
+	XnPoint3D *out = &projective[0];
+	
+	lock();
+	const XnDepthPixel* d = currentDepthRawPixels->getPixels();
+	unsigned int pixel;
+	for (int i=0; i<nPoints; ++i) {
+		pixel  = (int)c[i].x + (int)c[i].y * 640;
+		if (pixel >= 640*480)
+			continue;
+		
+		projective[i].X = c[i].x;
+		projective[i].Y = c[i].y;
+		projective[i].Z = float(d[pixel]) / 1000.0f;
+	}
+	unlock();
+	
+	g_Depth.ConvertProjectiveToRealWorld(nPoints, &projective[0], (XnPoint3D*)&w[0]);	
+}
