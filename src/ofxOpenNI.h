@@ -54,6 +54,7 @@ public:
 	ofPoint projectiveToWorld(const ofPoint & p);
 	ofPoint projectiveToWorld(const XnVector3D & p);
 
+	void cameraToWorld(const vector<ofVec2f>& c, vector<ofVec3f>& w);
 
 	void addLicense(string sVendor, string sKey);
 
@@ -115,7 +116,6 @@ private:
 	bool g_bIsIROn;
 	bool g_bIsAudioOn;
 	bool g_bIsPlayerOn;
-	
 	bool g_bIsDepthRawOnOption;
 
 	xn::Device g_Device;
