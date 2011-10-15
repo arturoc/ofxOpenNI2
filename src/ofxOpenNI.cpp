@@ -762,6 +762,16 @@ ofPoint ofxOpenNI::projectiveToWorld(const XnVector3D & p){
 }
 
 //----------------------------------------
+ofPoint ofxOpenNI::cameraToWorld(const ofVec2f & c){
+	vector<ofVec2f> vc(1, c);
+	vector<ofVec3f> vw(1);
+	
+	cameraToWorld(vc, vw);
+	
+	return vw[0];
+}
+
+//----------------------------------------
 void ofxOpenNI::cameraToWorld(const vector<ofVec2f>& c, vector<ofVec3f>& w){
 	const int nPoints = c.size();
 	w.resize(nPoints);
@@ -776,10 +786,15 @@ void ofxOpenNI::cameraToWorld(const vector<ofVec2f>& c, vector<ofVec3f>& w){
 	
 	lock();
 	const XnDepthPixel* d = currentDepthRawPixels->getPixels();
+	unsigned int pixel;
 	for (int i=0; i<nPoints; ++i) {
+		pixel  = (int)c[i].x + (int)c[i].y * 640;
+		if (pixel >= 640*480)
+			continue;
+		
 		projective[i].X = c[i].x;
 		projective[i].Y = c[i].y;
-		projective[i].Z = float(d[(int)c[i].x + (int)c[i].y * 640]) / 1000.0f;
+		projective[i].Z = float(d[pixel]) / 1000.0f;
 	}
 	unlock();
 	

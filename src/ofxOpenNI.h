@@ -54,6 +54,7 @@ public:
 	ofPoint projectiveToWorld(const ofPoint & p);
 	ofPoint projectiveToWorld(const XnVector3D & p);
 
+	ofPoint cameraToWorld(const ofVec2f& c);
 	void cameraToWorld(const vector<ofVec2f>& c, vector<ofVec3f>& w);
 
 	void addLicense(string sVendor, string sKey);
