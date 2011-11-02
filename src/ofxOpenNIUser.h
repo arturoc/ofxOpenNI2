@@ -28,6 +28,7 @@ public:
 
 	XnSkeletonJoint start_joint;
 	XnSkeletonJoint end_joint;
+	XnSkeletonJointOrientation orientation;
 
 	// position in projective coordinates
 	ofPoint begin,end;

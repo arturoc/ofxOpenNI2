@@ -226,6 +226,7 @@ void ofxOpenNITracker::update(){
 				XnSkeletonJointPosition a,b;
 				user_generator.GetSkeletonCap().GetSkeletonJointPosition(user.id, user.limbs[j].start_joint, a);
 				user_generator.GetSkeletonCap().GetSkeletonJointPosition(user.id, user.limbs[j].end_joint, b);
+				user_generator.GetSkeletonCap().GetSkeletonJointOrientation(user.id,user.limbs[j].start_joint, user.limbs[j].orientation);
 				if(a.fConfidence < 0.3f || b.fConfidence < 0.3f) {
 					user.limbs[j].found = false;
 					continue;
