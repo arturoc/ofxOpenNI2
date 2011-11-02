@@ -28,6 +28,10 @@ public:
 	ofTexture & getDepthTextureReference();
 	ofTexture & getRGBTextureReference();
 
+	ofMesh & getPointCloud();
+	void setGeneratePCColors(bool generateColors);
+	void setGeneratePCTexCoords(bool generateTexCoords);
+
 	float getWidth();
 	float getHeight();
 
@@ -157,4 +161,9 @@ private:
 	ofTexture rgbTexture;
 	ofPixels rgbPixels[2];
 	ofPixels * backRGBPixels, * currentRGBPixels;
+
+	// point cloud
+	ofMesh pointCloud;
+	bool isPointCloudValid;
+	bool bGeneratePCColors, bGeneratePCTexCoords;
 };

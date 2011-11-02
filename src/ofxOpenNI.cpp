@@ -77,6 +77,8 @@ ofxOpenNI::ofxOpenNI(){
 	depth_coloring = COLORING_RAINBOW;
 
 	useTexture = true;
+	bGeneratePCColors = false;
+	bGeneratePCTexCoords = false;
 }
 
 void ofxOpenNI::initConstants(){
@@ -227,6 +229,20 @@ void ofxOpenNI::openCommon(){
 	allocateDepthRawBuffers();
 	allocateRGBBuffers();
 
+
+	pointCloud.setMode(OF_PRIMITIVE_POINTS);
+	pointCloud.getVertices().resize(640*480);
+
+	int i=0;
+	for(int y=0;y<480;y++){
+		for(int x=0;x<640;x++){
+			pointCloud.getVertices()[i].set(float(x)/640.f,float(y)/480.f,0);
+			i++;
+		}
+	}
+
+	isPointCloudValid = false;
+
 	readFrame();
 }
 
@@ -338,7 +354,7 @@ void ofxOpenNI::readFrame(){
 		generateImagePixels();
 	}
 	
-	lock();
+	if(threaded) lock();
 	if(g_bIsDepthOn){
 		swap(backDepthPixels,currentDepthPixels);
 		if (g_bIsDepthRawOnOption) {
@@ -349,7 +365,7 @@ void ofxOpenNI::readFrame(){
 		swap(backRGBPixels,currentRGBPixels);
 	}
 	bNewPixels = true;
-	unlock();
+	if(threaded) unlock();
 }
 
 //----------------------------------------
@@ -381,6 +397,7 @@ void ofxOpenNI::update(){
 		}
 		bNewPixels = false;
 		bNewFrame = true;
+		isPointCloudValid = false;
 	}
 
 	if(threaded){
@@ -415,7 +432,7 @@ bool ofxOpenNI::toggleCalibratedRGBDepth(){
 //----------------------------------------
 bool ofxOpenNI::enableCalibratedRGBDepth(){
 	if (!g_Image.IsValid()) {
-		printf("No Image generator found: cannot register viewport");
+		ofLogError(LOG_NAME) << ("No Image generator found: cannot register viewport");
 		return false;
 	}
 
@@ -424,8 +441,11 @@ bool ofxOpenNI::enableCalibratedRGBDepth(){
 
 		XnStatus result = g_Depth.GetAlternativeViewPointCap().SetViewPoint(g_Image);
 		SHOW_RC(result, "Register viewport");
-		if(result!=XN_STATUS_OK) return false;
+		if(result!=XN_STATUS_OK){
+			return false;
+		}
 	}else{
+		ofLogError(LOG_NAME) << ("Can't enable calibrated RGB depth, alternative viewport capability not supported");
 		return false;
 	}
 
@@ -708,6 +728,57 @@ ofTexture & ofxOpenNI::getRGBTextureReference(){
 }
 
 //----------------------------------------
+void ofxOpenNI::setGeneratePCColors(bool generateColors){
+	bGeneratePCColors = generateColors;
+	if(bGeneratePCColors){
+		pointCloud.getColors().resize(640*480);
+	}else{
+		pointCloud.getColors().clear();
+	}
+}
+
+//----------------------------------------
+void ofxOpenNI::setGeneratePCTexCoords(bool generateTexCoords){
+	bGeneratePCTexCoords = generateTexCoords;
+	if(bGeneratePCTexCoords){
+		pointCloud.getTexCoords().resize(640*480);
+		int i=0;
+		for(int y=0;y<480;y++){
+			for(int x=0;x<640;x++){
+				pointCloud.getTexCoords()[i].set(x,y);
+				i++;
+			}
+		}
+	}else{
+		pointCloud.getTexCoords().clear();
+	}
+}
+
+//----------------------------------------
+ofMesh & ofxOpenNI::getPointCloud(){
+	if(!isPointCloudValid){
+		mutex.lock();
+		const XnDepthPixel * depth = g_DepthMD.Data();
+		for (XnUInt16 y = g_DepthMD.YOffset(); y < g_DepthMD.YRes() + g_DepthMD.YOffset(); y++) {
+			ofVec3f * pcDepth = &pointCloud.getVertices()[0] + y * g_DepthMD.XRes() + g_DepthMD.XOffset();
+			for (XnUInt16 x = 0; x < g_DepthMD.XRes(); x++, depth++, pcDepth++) {
+				pcDepth->z = (*depth)/max_depth;
+			}
+		}
+		if(g_bIsImageOn && bGeneratePCColors){
+			unsigned char * rgbColorPtr = currentRGBPixels->getPixels();
+			for(int i=0;i<(int)pointCloud.getColors().size();i++){
+				pointCloud.getColors()[i] = ofColor(*rgbColorPtr, *(rgbColorPtr+1), *(rgbColorPtr+2));
+				rgbColorPtr+=3;
+			}
+		}
+		mutex.unlock();
+		isPointCloudValid = true;
+	}
+	return pointCloud;
+}
+
+//----------------------------------------
 float ofxOpenNI::getWidth(){
 	if(g_bIsDepthOn){
 		return g_DepthMD.XRes();
@@ -784,7 +855,7 @@ void ofxOpenNI::cameraToWorld(const vector<ofVec2f>& c, vector<ofVec3f>& w){
 	vector<XnPoint3D> projective(nPoints);
 	XnPoint3D *out = &projective[0];
 	
-	lock();
+	if(threaded) lock();
 	const XnDepthPixel* d = currentDepthRawPixels->getPixels();
 	unsigned int pixel;
 	for (int i=0; i<nPoints; ++i) {
@@ -796,7 +867,7 @@ void ofxOpenNI::cameraToWorld(const vector<ofVec2f>& c, vector<ofVec3f>& w){
 		projective[i].Y = c[i].y;
 		projective[i].Z = float(d[pixel]) / 1000.0f;
 	}
-	unlock();
+	if(threaded) unlock();
 	
 	g_Depth.ConvertProjectiveToRealWorld(nPoints, &projective[0], (XnPoint3D*)&w[0]);	
 }
